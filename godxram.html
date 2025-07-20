@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GodxRam Chat</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #1f1f1f;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .login, .chat {
+      padding: 1rem;
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #ff0066;
+      color: white;
+      font-weight: bold;
+    }
+    .message-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .msg {
+      margin: 5px 0;
+      background: #272727;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .me {
+      background: #ff0066;
+      color: white;
+      align-self: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <header>GodxRam Chat</header>
+
+  <div class="login active">
+    <h3>Login</h3>
+    <input type="text" id="username" placeholder="Username (anuh or ram)">
+    <input type="password" id="password" placeholder="Password (GodxKey)">
+    <button onclick="login()">Login</button>
+    <p id="loginError" style="color: red;"></p>
+  </div>
+
+  <div class="chat">
+    <div class="message-box" id="messages"></div>
+    <input type="text" id="msgInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const allowedUsers = {
+      anuh: "GodxKey",
+      ram: "GodxKey"
+    };
+    let currentUser = "";
+
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      if (allowedUsers[username] && allowedUsers[username] === password) {
+        currentUser = username;
+        document.querySelector(".login").classList.remove("active");
+        document.querySelector(".chat").classList.add("active");
+        loadMessages();
+      } else {
+        document.getElementById("loginError").innerText = "Invalid credentials.";
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("msgInput");
+      const text = input.value.trim();
+      if (!text) return;
+      const messages = JSON.parse(localStorage.getItem("messages") || "[]");
+      messages.push({ user: currentUser, text });
+      localStorage.setItem("messages", JSON.stringify(messages));
+      input.value = "";
+      loadMessages();
+    }
+
+    function loadMessages() {
+      const messages = JSON.parse(localStorage.getItem("messages") || "[]");
+      const msgBox = document.getElementById("messages");
+      msgBox.innerHTML = "";
+      messages.forEach(m => {
+        const msg = document.createElement("div");
+        msg.classList.add("msg");
+        if (m.user === currentUser) msg.classList.add("me");
+        msg.innerText = `${m.user}: ${m.text}`;
+        msgBox.appendChild(msg);
+      });
+      msgBox.scrollTop = msgBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
